@@ -1,0 +1,147 @@
+---
+title: "Stawberries 1"
+author: MA615
+date: 2025 October 10
+format: 
+    html:
+       embed-resources: false
+editor: visual
+---
+
+# A comprehensive project
+
+Data discovery, acquisition, cleaning, organization, and exploration
+
+# Preparing data for analysis
+
+Research, discovery, acquisition, clean, organize, explore, report
+
+## Research
+
+Main data source: [USDA Quickstats](https://quickstats.nass.usda.gov/)
+
+[Census of Agriculture](https://www.nass.usda.gov/AgCensus/)
+
+[Survey of Agriculture](https://www.nass.usda.gov/Surveys/index.php)
+
+North American Strawberry Growers Association: <https://www.nasga.org/>)
+
+Organic Farmers Association: <https://organicfarmersassociation.org/>
+
+[US Strawberry Market Annual Report, June 20, 2024](https://www.freshproduce.com/siteassets/files/reports/global-trade/2024/strawberries_annual_market_report_2024.pdf)
+
+<https://www.freshproduce.com/siteassets/files/reports/global-trade/2024/strawberries_annual_market_report_2024.pdf>
+
+<https://www.agmrc.org/commodities-products/fruits/strawberries>
+
+["An introduction to data cleaning with R" by Edwin de Jonge and Mark van der Loo](https://cran.r-project.org/doc/contrib/de_Jonge+van_der_Loo-Introduction_to_data_cleaning_with_R.pdf)
+
+["Problems, Methods, and Challenges in Comprehensive Data Cleansing" by Heiko Müller and Johann-Christoph Freytag](https://www.researchgate.net/profile/Heiko-Mueller/publication/228929938_Problems_methods_and_challenges_in_comprehensive_data_cleansing/links/09e415101b58541e2c000000/Problems-methods-and-challenges-in-comprehensive-data-cleansing.pdf)
+
+## Strawberries
+
+**Questions**
+
+-   Where they are grown? By whom?
+
+-   Are they really loaded with carcinogenic poisons?
+
+-   Are they really good for your health? Bad for your health?
+
+-   Are organic strawberries carriers of deadly diseases?
+
+-   When I go to the market should I buy conventional or organic strawberries?
+
+-   Do Strawberry farmers make money?
+
+-   How do the strawberries I buy get to my market?
+
+## The data
+
+The data set for this assignment has been selected from:
+
+## read and explore the data
+
+Set-up
+
+```{r}
+#| label: load libraries and set options
+#| warning: false
+#| message: false
+
+library(knitr)  
+library(kableExtra)
+library(tidyverse)
+library(stringr)
+
+```
+
+Read the data and take a first look
+
+```{r}
+#| label: read data - glimpse 
+
+strawberry <- read_csv("strawberry_10Oct25.csv", col_names = TRUE)
+
+glimpse(strawberry)
+##Oct25
+```
+
+There are 12699 rows and 21 columns.
+
+All I can see from the glimpse is I have date, location, values and coefficients of variation.
+
+Examine the data. How is it organized?
+
+```{r}
+#| label: explore organization 1 
+
+
+## Is every line associated with a state?
+
+state_all <- strawberry |> distinct(State)
+
+state_all1 <- strawberry |> group_by(State) |> count()
+
+## every row is associated with a state
+
+if(sum(state_all1$n) == dim(strawberry)[1]){print("Yes every row in the data is associated with a state.")}
+
+## rm(state_all, state_all1)
+
+```
+
+## remove columns with a single value in all rows
+
+```{r}
+#|label: function def - drop 1-item columns
+
+### write your function
+
+## use the function
+
+## strawberry <- drop_one_value_col(strawberry)
+
+## drop_one_value_col(strawberry)
+
+```
+
+## Plan your approach
+
+### To get better look at the data, look at California.
+
+Explore California to understand the census and survey
+
+Write down your conclusions from California data exploration.
+
+### Now return to the entire data set.
+
+take the lessons learned by examinging the California data
+
+Split the census dat from the survey data. drop single value columns
+
+## separate composite columns
+
+## What issues can you address wit this data?
+
+## What do you need to make use of the chemicals data?

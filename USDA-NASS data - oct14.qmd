@@ -1,0 +1,354 @@
+---
+title: "Stawberries 3"
+author: MA615
+date: 2025 October 17
+format: 
+    html:
+       embed-resources: false
+editor: source 
+---
+
+# A comprehensive project
+
+Data discovery, acquisition, cleaning, organization, and exploration
+
+# Preparing data for analysis
+
+Research, discovery, acquisition, clean, organize, explore, report
+
+## Research
+
+Main data source: [USDA Quickstats](https://quickstats.nass.usda.gov/)
+
+[Census of Agriculture](https://www.nass.usda.gov/AgCensus/)
+
+[Survey of Agriculture](https://www.nass.usda.gov/Surveys/index.php)
+
+North American Strawberry Growers Association: <https://www.nasga.org/>)
+
+Organic Farmers Association: <https://organicfarmersassociation.org/>
+
+[US Strawberry Market Annual Report, June 20, 2024](https://www.freshproduce.com/siteassets/files/reports/global-trade/2024/strawberries_annual_market_report_2024.pdf)
+
+<https://www.freshproduce.com/siteassets/files/reports/global-trade/2024/strawberries_annual_market_report_2024.pdf>
+
+<https://www.agmrc.org/commodities-products/fruits/strawberries>
+
+["An introduction to data cleaning with R" by Edwin de Jonge and Mark van der Loo](https://cran.r-project.org/doc/contrib/de_Jonge+van_der_Loo-Introduction_to_data_cleaning_with_R.pdf)
+
+["Problems, Methods, and Challenges in Comprehensive Data Cleansing" by Heiko Müller and Johann-Christoph Freytag](https://www.researchgate.net/profile/Heiko-Mueller/publication/228929938_Problems_methods_and_challenges_in_comprehensive_data_cleansing/links/09e415101b58541e2c000000/Problems-methods-and-challenges-in-comprehensive-data-cleansing.pdf)
+
+## Strawberries
+
+**Questions**
+
+-   Where they are grown? By whom?
+
+-   Are they really loaded with carcinogenic poisons?
+
+-   Are they really good for your health? Bad for your health?
+
+-   Are organic strawberries carriers of deadly diseases?
+
+-   When I go to the market should I buy conventional or organic strawberries?
+
+-   Do Strawberry farmers make money?
+
+-   How do the strawberries I buy get to my market?
+
+## The data
+
+The data set for this assignment has been selected from:
+
+## read and explore the data
+
+Set-up
+
+```{r}
+#| label: load libraries and set options
+#| warning: false
+#| message: false
+
+library(knitr)  
+library(kableExtra)
+library(tidyverse)
+library(stringr)
+
+
+
+```
+
+Read the data and take a first look
+
+```{r}
+#| label: read data - glimpse 
+
+strawberry <- read_csv("strawberry_10Oct25.csv", col_names = TRUE)
+
+# glimpse(strawberry)
+##Oct25
+```
+
+
+
+All I can see from the glimpse is I have date, location, values and coefficients of variation.
+
+Examine the data. How is it organized?
+
+```{r}
+#| label: explore organization 1 
+
+## Is every line associated with a state?
+
+state_all <- strawberry |> distinct(State)
+
+state_all1 <- strawberry |> group_by(State) |> count()
+
+years <- strawberry |> distinct(Year)
+
+
+## every row is associated with a state
+
+if(sum(state_all1$n) == dim(strawberry)[1]){print("Yes every row in the data is associated with a state.")}
+
+## rm(state_all, state_all1)
+
+```
+
+## remove columns with a single value in all rows
+
+```{r}
+#|label: function def - drop 1-item columns
+
+drop_one_value_col <- function(df){   ## takes whole dataframe
+drop <- NULL  
+
+## test each column for a single value
+for(i in 1:dim(df)[2]){     
+if((df |> distinct(df[,i]) |> count()) == 1){
+drop = c(drop, i)
+} }
+
+## report the result -- names of columns dropped
+## consider using the column content for labels 
+## or headers 
+
+if(is.null(drop)){return("none")}else{
+
+   print("Columns dropped:")
+   print(colnames(df)[drop])
+   strawberry <- df[, -1*drop]
+   }
+}
+
+
+## use the function
+
+strawberry <- drop_one_value_col(strawberry)
+
+drop_one_value_col(strawberry)
+
+```
+
+To get better look at the data, look at California.
+
+```{r}
+#| label: explore California only
+
+calif <- strawberry |>  filter(State=="CALIFORNIA")
+
+## look at the unique values in the "Program" column
+
+## in the consol
+## unique(calif$Program)
+
+## and look at the data selection widget on 
+##      https://quickstats.nass.usda.gov
+
+## You can see that CENSUS AND SURVEY are the two sources
+## of data. (Why? What's the differences?).  So, let's see
+## they differ.
+
+calif_census <- calif |> filter(Program=="CENSUS")
+
+calif_survey  <- calif |>  filter(Program=="SURVEY")
+
+### 
+
+
+##calif_survey <- strawberry |> select(Year, Period, `Data Item`, Value)
+
+
+```
+
+Explore California to understand the census and survey
+
+```{r}
+#| label: explore Calif census and survey 
+
+## no assignment -- just exploring
+
+drop_one_value_col(calif_census)
+
+drop_one_value_col(calif_survey)
+
+
+
+```
+
+Conclusions from California data exploration.
+
+
+Clean up the variables created while exploring
+
+```{r}
+#| label: cleanup after CA
+
+rm(calif, calif_census, calif_survey, 
+   state_all, state_all1)
+
+```
+
+
+
+
+## Now return to the entire data set.
+
+take the lessons learned by examinging the California data
+
+Before we split the CENSUS rows from the SURVEY rows,
+here is a "low hanging fruit" opportunity ...
+
+```{r}
+#| label: test for a potential one-value col
+
+## look at col = `Data Item`
+## looks like every row starts with "STRAWBERRIES" 
+## TEST IT 
+
+test1 <- str_starts(strawberry$`Data Item`, 
+                    "STRAWBERRIES - " )
+
+sum(test1) == dim(strawberry)[1]
+
+test2 <- str_starts(strawberry$`Data Item`, "STRAWBERRIES" )
+sum(test2) == dim(strawberry)[1]
+
+## ok sould you drop the 
+## leading "STRAWBERRIES" from each row?
+## that depends on if you understand all the patterns
+
+
+## try two examples 
+t1 <- which(test1 == TRUE)[2]
+strawberry$`Data Item`[t1]
+
+t2 <- which(test1 == FALSE)[2]
+strawberry$`Data Item`[t2]
+
+##
+## Use str_detect to build a regex pattern 
+## that matches both instances
+
+str_detect(strawberry$`Data Item`[t1], "^ST.*IES\ -\ ")
+
+str_detect(strawberry$`Data Item`[t1], "^ST.*IES(,\ )")
+
+## the expressions above may work as an 'or'
+
+str_detect(strawberry$`Data Item`[t2], 
+           "^ST.*IES((\ -\ )|(,\ ))")
+
+## test it
+
+test3 <- str_starts(strawberry$`Data Item`, 
+                    "^ST.*IES((\ -\ )|(,\ ))")
+
+sum(test3) == dim(strawberry)[1]
+
+## OK use the regex to cleanup the 
+## `Date Item` column
+
+strawberry$`Data Item` <- 
+  str_replace(strawberry$`Data Item`, 
+              "^ST.*IES((\ -\ )|(,\ ))", "")
+
+## and clean up the workspace 
+rm(t1, t2, test1, test2, test3)
+
+```
+
+OK -- 
+Split the census dat from the survey data. drop single value columns
+
+```{r}
+#| label: survey, census spit
+
+strawb_survey <- strawberry |> filter(Program=="SURVEY")
+
+strawb_census <- strawberry |> filter(Program=="CENSUS")
+
+strawb_survey <- drop_one_value_col(strawb_survey)
+
+strawb_census <- drop_one_value_col(strawb_census)
+
+
+```
+
+
+
+
+
+```{r}
+#| label: census data item analysis
+
+census_data_items <- strawb_census |> distinct(`Data Item`)
+
+```
+
+
+Use census data items to plan how to use and show the information in the ag census data.
+
+
+
+## separate composite columns
+
+### Now examine strawb_survey
+
+```{r}
+#|label: examine strawb_survey
+
+surv_data_item <- strawb_survey |> distinct(`Data Item`)
+
+## observe the data 
+## we want so split the data category 
+## from the data
+
+t1 <- str_detect(surv_data_item$`Data Item`, "\ -\ ")
+
+strawb_survey$`Data Item` <- str_replace(strawb_survey$`Data Item`, ", " ,"\ -\ ")
+
+
+strawb_survey <- strawb_survey |>
+  separate_wider_delim(  cols = `Data Item`,
+                         delim = " - ",
+                         names = c("category",
+                                 "data1",
+                                 "data2"),
+                         too_many = "error",
+                         too_few = "align_start"
+                       )
+
+
+```
+
+
+You can see that the chemical data is not in this data set. 
+What do you do?
+
+#### usda nass system  https://quickstats.nass.usda.gov/
+
+or
+
+#### R Package rnassqs 
+
