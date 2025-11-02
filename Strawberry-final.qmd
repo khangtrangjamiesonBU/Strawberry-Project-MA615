@@ -148,6 +148,8 @@ write.csv(strawberry_survey, "strawberry_survey.csv", row.names = FALSE)
 
 ### Examine the relationship between Year-State-Variable "Acres Bearing"-Value-CV% in Census
 
+In this section, we want to look at the differences between states, in Census data, on the variable: Acres Bearing. This is referring to the the number of acres of land where strawberries are produced. And here we are looking at two different years, which is 2022 and 2017.
+
 ```{r, warning=FALSE, message=FALSE}
 
 df_ST <- read.csv("strawberry_census.csv")
@@ -197,7 +199,11 @@ ggplot(state_summary2017, aes(x = reorder(State, total_acres), y = total_acres, 
   theme(legend.position = "none")
 ```
 
+From the plots above, we can easily find out the amount all six states, California is have the most Acres Bearing. Also, if we compare two time periods, we can find that the value of Acres Bearing had increased during these 5 years (from 2017 to 2022). Then, we can find that North Carolina also increased their value on Acres Bearing from the sixth to the third.
+
 ### Examine the relationship between Year-State-Variable "Yield"-Value-CV% in Survey
+
+In this part, we go to the Survey data. And we are looking at different value for analysis, which is Yield, this means the amount of strawberries harvested per unit of productive area. We mainly analyzed 5 years. In the years of 2017 and 2018, we analyzed 6 states. While in th years from 2023 to 2025, we only included 2 states, which California and Florida. This is because we find out that these two states are two of the main agriculture states and plants more strawberries.
 
 ```{r, warning=FALSE, message=FALSE}
 
@@ -316,6 +322,8 @@ ggplot(state_summary_sur_2017, aes(x = reorder(State, total_acres), y = total_ac
 
 ### Quick read pesticide file (raw data collected from other sources)
 
+Here we are using our data of pesticide from NSDA. And since insecticides, the topic our group is going to analysis, is a kind of pesticide, we will introduce pesticide data, then select insecticides from them.
+
 ```{r, warning=FALSE, message=FALSE}
 df_ins <- read.csv("raw-data.csv")
 #Remove unnecessary columns, split domain column to simplify dataset
@@ -360,6 +368,8 @@ cat("Based on the research I conducted using the references below, California ap
 ```
 
 ### Visualization the relationship between insecticides and lbs of strawberries (technically correct data to consistent data)
+
+After analyzing data from strawberries and insecticides, we can now combine them all together to work on the further analysis. We want to find the relationship between insecticides and how many lbs of strawberries each states can produce. Here we use the plots to help us illustrate the relationship.
 
 ```{r, warning=FALSE, message=FALSE}
 # --- your prep (kept) ---
@@ -432,6 +442,8 @@ cat("The chemicals circled in red represent traditional insecticides, while thos
 
 ### Import dataset of popular insecticides
 
+Among those organic interstices, we want to find which one will cause more diseases. And one of the most important reason for getting illness from insecticides is the exposure problem. Thus, we will use the datasets which included different organic insecticides with their exposure data. Then, we can find which insecticide might cause health problem.
+
 ```{r, warning=FALSE, message=FALSE}
 xc <- read.csv("pyrethrin-vs-other-insecticides.csv")
 #Check how many uique insecticides there are in the dataset
@@ -464,23 +476,23 @@ cat("We collected data of pulmonary function, Pyrethrins, and Patient's demograp
 ### Import files
 
 ```{r, warning=FALSE, message=FALSE}
-pyr_0708 <- read.xport("UPHOPM_E_2007-2008.xpt")
+pyr_0708 <- read.xport("/Users/liuchunlin/Downloads/Strawberry-project/UPHOPM_E_2007-2008.xpt")
 write.csv(pyr_0708, file = "pyrethrin0708.csv")
-pyr_0910 <- read.xport("UPHOPM_F_2009-2010.xpt")
+pyr_0910 <- read.xport("/Users/liuchunlin/Downloads/Strawberry-project/UPHOPM_F_2009-2010.xpt")
 write.csv(pyr_0910, file = "pyrethrin0910.csv")
-pyr_1112 <- read.xport("UPHOPM_G_2011-2012.xpt")
+pyr_1112 <- read.xport("/Users/liuchunlin/Downloads/Strawberry-project/UPHOPM_G_2011-2012.xpt")
 write.csv(pyr_1112, file = "pyrethrin1112.csv")
-lung_0708 <- read.xport("SPX_E_2007-2008.xpt")
+lung_0708 <- read.xport("/Users/liuchunlin/Downloads/Strawberry-project/SPX_E_2007-2008.xpt")
 write.csv(lung_0708, file = "lung0708.csv")
-lung_0910 <- read.xport("SPX_F_2009-2010.xpt")
+lung_0910 <- read.xport("/Users/liuchunlin/Downloads/Strawberry-project/SPX_F_2009-2010.xpt")
 write.csv(lung_0910, file = "lung0910.csv")
-lung_1112 <- read.xport("SPX_G_2011-2012.xpt")
+lung_1112 <- read.xport("/Users/liuchunlin/Downloads/Strawberry-project/SPX_G_2011-2012.xpt")
 write.csv(lung_1112, file = "lung1112.csv")
-demo_0708 <- read.xport("DEMO_E_2007-2008.xpt")
+demo_0708 <- read.xport("/Users/liuchunlin/Downloads/Strawberry-project/DEMO_E_2007-2008.xpt")
 write.csv(demo_0708, file = "demo0708.csv")
-demo_0910 <- read.xport("DEMO_F_2009-2010.xpt")
+demo_0910 <- read.xport("/Users/liuchunlin/Downloads/Strawberry-project/DEMO_F_2009-2010.xpt")
 write.csv(demo_0910, file = "demo0910.csv")
-demo_1112 <- read.xport("DEMO_G_2011-2012.xpt")
+demo_1112 <- read.xport("/Users/liuchunlin/Downloads/Strawberry-project/DEMO_G_2011-2012.xpt")
 write.csv(demo_1112, file = "demo1112.csv")
 ```
 
@@ -520,6 +532,8 @@ message(sprintf("Same ORDER of SEQN? py vs lu: %s; py vs de: %s",
 
 ### Merge on the common SEQN
 
+According to NHANES dataset's definition, SEQN is Respondent sequence number. This is a unique ID number for each patients to verify their own lab and examination result. Thus, we merge the data set by the variable SEQN.
+
 ```{r, warning=FALSE, message=FALSE}
 merged_78 <- py78_clean %>%
   inner_join(lu78_clean, by = "SEQN") %>%
@@ -536,6 +550,8 @@ write_csv(merged_78, "nhanes_0708_merged.csv")
 
 ### Calculate means and impute them to NAs in all the column of the dataset
 
+In our dataset, there are some variables contains NAs in the columns. And since they are numerical, we decide to calculate the means of each columns to impute and replace the NAs in the columns.
+
 ```{r, warning=FALSE, message=FALSE}
 #Calculate the mean of all columns
 means <- sapply(merged_78[, c("URXOPM", "SPXNFEV1", "SPXNFVC", "SPXNPEF", "RIDAGEEX")], mean, na.rm = TRUE)
@@ -546,7 +562,9 @@ for (col in names(means)) {
 write.csv(merged_78, "nhanes_0708_noNA.csv", row.names = FALSE)
 ```
 
-### #Create 3 exposure groups based on URXOPM (3-PBA) #Low exposure: values \< LOD (below detection) #Medium exposure: detectable but \< median #High exposure: detectable ≥ median
+### Create 3 exposure groups based on URXOPM (3-PBA) #Low exposure: values \< LOD (below detection) #Medium exposure: detectable but \< median #High exposure: detectable ≥ median
+
+In this part, we will mainly focus on the variable URXOPM, and this is representing 3-phenoxybenzoic acid (3-PBA in short) result. This result test reflects how possible someone will have pulmonary function problem. Thus, we want to look at the exposure of 3-PBA and the possibility of getting reduces pulmonary function. Also, since we are redoing the method mentioned in the paper, it will be better for us to explain each variable in the paper. FEV1 in our code representing the forced expiratory volume in 1s; FVC means forced vital capacity; and PEF is peak expiratory flow. All of those variables mentioned above is the way we used to test someones' pulmonary function. 
 
 ```{r, warning=FALSE, message=FALSE}
 cat("Here we replicate the statistical analysis used in the research paper.", "\n")
@@ -597,6 +615,8 @@ hist(df$log_FEV1, main = "log10(FEV1)", col = "skyblue")
 hist(df$log_FVC, main = "log10(FVC)", col = "lightgreen")
 hist(df$log_PEF, main = "log10(PEF)", col = "lightpink")
 ```
+
+By using the the log function, the plot here is closer to normal distribution.
 
 ```{r, warning=FALSE, message=FALSE}
 # --- 1) Recode predictors ---
